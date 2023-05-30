@@ -44,11 +44,11 @@ for i in $(seq $num_thumb); do
     frame="$(printf '%02d' $(($frame_in_seconds/3600))):\
 $(printf '%02d' $(($frame_in_seconds%3600/60))):\
 $(printf '%02d' $(($frame_in_seconds%60)))"
-    ffmpeg -loglevel warning -ss $frame -i "$file" -vf scale=1080:-1 -vframes 1 "./.thumb/thumb_$(printf '%02d' $i).png"
-    convert "./.thumb/thumb_$(printf '%02d' $i).png" -gravity SouthEast -pointsize 50\
+    ffmpeg -loglevel warning -ss $frame -i "$file" -vf scale=1080:-1 -vframes 1 "./.thumb/thumb_$(printf '%02d' $i).jpg"
+    convert "./.thumb/thumb_$(printf '%02d' $i).jpg" -gravity SouthEast -pointsize 50\
           -stroke '#000C' -strokewidth 10 -annotate 0 $frame \
           -stroke  none   -fill white    -annotate 0 $frame \
-          "./.thumb/thumb_$(printf '%02d' $i).png"
+          "./.thumb/thumb_$(printf '%02d' $i).jpg"
 done
 
 
@@ -60,14 +60,14 @@ video=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name \
 audio=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name \
   -of default=noprint_wrappers=1:nokey=1 "$file")
 
-montage -tile x3 -shadow -geometry +10+10 -background white ./.thumb/thumb_*.png "./.thumb/${file%.*}.png"
+montage -tile x3 -shadow -geometry +10+10 -background white ./.thumb/thumb_*.jpg "./.thumb/${file%.*}.jpg"
 
-convert "./.thumb/${file%.*}.png" -pointsize 50\
+convert "./.thumb/${file%.*}.jpg" -pointsize 50\
         -font "/System/Library/Fonts/PingFang.ttc" \
         -splice 0x200\
         -gravity NorthWest -annotate 0 "File: $file\nSize: $size\nDuration: $len"\
         -gravity NorthEast -annotate 0 "Resolution: $resolution\nFPS: $fps\nCodec: $video/$audio"\
-        -append -resize 1920x -sampling-factor 4:2:0 -strip -quality 85 -interlace JPEG -colorspace RGB "${file%.*}.jpg"
+        -append -resize 1920x -sampling-factor 4:2:0 -strip -quality 100 -interlace JPEG -colorspace sRGB "${file%.*}.jpg"
           
 rm -rf ./.thumb
 
